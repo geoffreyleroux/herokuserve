@@ -46,23 +46,23 @@ function handleError(res, reason, message, code) {
 
 /* get all news */
 app.get("/news", function(req, res) {
-
+  console.log("TEST");
 });
 /* add news */
 app.post("/news", function(req, res) {
-
+  console.log("TEST");
 
 });
 /* get one news */
 app.get("/news/:id", function(req, res) {
-
+  console.log("TEST");
 });
 /* update one news */
 app.put("/news/:id", function(req, res) {
-
+  console.log("TEST");
 
 });
 /* delete one news */
 app.delete("/news/:id", function(req, res) {
-
+  console.log("TEST");
 });
