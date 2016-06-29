@@ -14,7 +14,13 @@ app.use(bodyParser.json());
 var db;
 
 // Connect to the database before starting the application server.
-mongodb.MongoClient.connect(process.env.MONGODB_URI, function(err, database) {
+// mongodb.MongoClient.connect(process.env.MONGODB_URI, function(err, database) {
+//   if (err) {
+//     console.log(err);
+//     process.exit(1);
+//   }
+  // Connect to the database before starting the application server.
+mongodb.MongoClient.connect("mongodb://geoffrey:a@ds023694.mlab.com:23694/heroku_bv9n9svh", function(err, database) {
   if (err) {
     console.log(err);
     process.exit(1);
@@ -38,24 +44,25 @@ function handleError(res, reason, message, code) {
   });
 }
 
+/* get all news */
 app.get("/news", function(req, res) {
 
 });
-
+/* add news */
 app.post("/news", function(req, res) {
 
 
 });
-
+/* get one news */
 app.get("/news/:id", function(req, res) {
 
 });
-
+/* update one news */
 app.put("/news/:id", function(req, res) {
 
 
 });
-
+/* delete one news */
 app.delete("/news/:id", function(req, res) {
 
 });
