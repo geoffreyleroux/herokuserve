@@ -10,6 +10,11 @@ var app = express.createServer();
 mongoose.connect('mongodb://localhost/ecomm_database');
 
 // Config
+app.use(function(req, res, next) {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+  next();
+});
 
 app.configure(function () {
   app.use(express.bodyParser());
@@ -22,6 +27,8 @@ app.configure(function () {
 app.get('/api', function (req, res) {
   res.send('Ecomm API is running');
 });
+
+
 
 // Launch server
 
