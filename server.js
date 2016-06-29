@@ -47,6 +47,14 @@ function handleError(res, reason, message, code) {
 /* get all news */
 app.get("/news", function(req, res) {
   console.log("TEST");
+    db.collection(NEWS_COLLECTION).find({}).toArray(function(err, docs) {
+    if (err) {
+      handleError(res, err.message, "Failed to get contacts.");
+    } else {
+      res.status(200).json(docs);
+    }
+  });
+
 });
 /* add news */
 app.post("/news", function(req, res) {
