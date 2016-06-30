@@ -5,10 +5,11 @@ var mongodb = require("mongodb");
 var ObjectID = mongodb.ObjectID;
 
 var NEWS_COLLECTION = "news";
+var COMMENTS_COLLECTION = "comments";
 
 var app = express();
 
-app.use(function (req, res, next) {
+app.use(function(req, res, next) {
     // Website you wish to allow to connect
     res.setHeader('Access-Control-Allow-Origin', '*');
 
@@ -32,63 +33,130 @@ app.use(bodyParser.json());
 var db;
 
 // Connect to the database before starting the application server.
-// mongodb.MongoClient.connect(process.env.MONGODB_URI, function(err, database) {
-//   if (err) {
-//     console.log(err);
-//     process.exit(1);
-//   }
-  // Connect to the database before starting the application server.
 mongodb.MongoClient.connect("mongodb://geoffrey:a@ds023694.mlab.com:23694/heroku_bv9n9svh", function(err, database) {
-  if (err) {
-    console.log(err);
-    process.exit(1);
-  }
+    if (err) {
+        console.log(err);
+        process.exit(1);
+    }
 
-  // Save database object from the callback for reuse.
-  db = database;
-  console.log("Database connection ready");
+    // Save database object from the callback for reuse.
+    db = database;
+    console.log("Database connection ready");
 
-  // Initialize the app.
-  var server = app.listen(process.env.PORT || 8080, function() {
-    var port = server.address().port;
-    console.log("App now running on port", port);
-  });
+    // Initialize the app.
+    var server = app.listen(process.env.PORT || 8080, function() {
+        var port = server.address().port;
+        console.log("App now running on port", port);
+    });
 });
 
 function handleError(res, reason, message, code) {
-  console.log("ERROR: " + reason);
-  res.status(code || 500).json({
-    "error": message
-  });
+    console.log("ERROR: " + reason);
+    res.status(code || 500).json({
+        "error": message
+    });
 }
 
 /* get all news */
 app.get("/news", function(req, res) {
-  console.log("TEST");
+    console.log("get news");
     db.collection(NEWS_COLLECTION).find({}).toArray(function(err, docs) {
-    if (err) {
-      handleError(res, err.message, "Failed to get contacts.");
-    } else {
-      res.status(200).json(docs);
-    }
-  });
+        if (err) {
+            handleError(res, err.message, "Failed to get news.");
+        } else {
+            res.status(200).json(docs);
+        }
+    });
 
 });
 /* add news */
 app.post("/news", function(req, res) {
-  console.log("TEST");
+    console.log("add news");
+    var news = req.body;
+    news.createDate = new Date();
 
+    db.collection(NEWS_COLLECTION).insertOne(news, function(err, doc) {
+        if (err) {
+            handleError(res, err.message, "Failed to create new news.");
+        } else {
+            res.status(201).json(doc.ops[0]);
+        }
+    });
 });
+
 /* get one news */
 app.get("/news/:id", function(req, res) {
-  console.log("TEST");
+    console.log("get one news");
+    db.collection(NEWS_COLLECTION).findOne({
+        _id: new ObjectID(req.params.id)
+    }, function(err, doc) {
+        if (err) {
+            handleError(res, err.message, "Failed to get news");
+        } else {
+            res.status(200).json(doc);
+        }
+    });
 });
+
 /* update one news */
 app.put("/news/:id", function(req, res) {
-  console.log("TEST");
+    console.log("update one news");
+    var updateDoc = req.body;
+    delete updateDoc._id;
+
+    db.collection(NEWS_COLLECTION).updateOne({
+        _id: new ObjectID(req.params.id)
+    }, updateDoc, function(err, doc) {
+        if (err) {
+            handleError(res, err.message, "Failed to update news");
+        } else {
+            res.status(204).end();
+        }
+    });
 
 });
 /* delete one news */
 app.delete("/news/:id", function(req, res) {
-  console.log("TEST");
+    console.log("delete one news");
+    db.collection(NEWS_COLLECTION).deleteOne({
+        _id: new ObjectID(req.params.id)
+    }, function(err, result) {
+        if (err) {
+            handleError(res, err.message, "Failed to delete news");
+        } else {
+            res.status(204).end();
+        }
+    });
+});
+
+
+/********** COMMENT **********/
+/********** COMMENT **********/
+/********** COMMENT **********/
+/********** COMMENT **********/
+
+/* get all comments by news id*/
+app.get("/comments/:id", function(req, res) {
+    db.collection(COMMENTS_COLLECTION).find({ news_id: req.params.id }).toArray(function(err, docs) {
+        if (err) {
+            handleError(res, err.message, "Failed to get comments.");
+        } else {
+            res.status(200).json(docs);
+        }
+    });
+});
+
+/* add comments */
+app.post("/comments", function(req, res) {
+    console.log("add comments");
+    var comments = req.body;
+    comments.createDate = new Date();
+
+    db.collection(COMMENTS_COLLECTION).insertOne(comments, function(err, doc) {
+        if (err) {
+            handleError(res, err.message, "Failed to create new comment.");
+        } else {
+            res.status(201).json(doc.ops[0]);
+        }
+    });
 });
