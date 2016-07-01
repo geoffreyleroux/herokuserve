@@ -69,6 +69,56 @@ app.get("/news", function(req, res) {
     });
 
 });
+
+/* add comment */
+app.put("/news/:id/comments", function(req, res) {
+    var comments = req.body;
+    comments.createDate = new Date();
+
+    db.collection(NEWS_COLLECTION).findOne({
+        _id: new ObjectID(req.params.id)
+    }, function(err, doc) {
+        if (err) {
+            handleError(res, err.message, "Failed to get news");
+        } else {
+            doc.comments.push(comments);
+            db.collection(NEWS_COLLECTION).updateOne({
+                _id: new ObjectID(req.params.id)
+            }, doc, function(err, doc) {
+                if (err) {
+                    handleError(res, err.message, "Failed to update news");
+                } else {
+                    res.status(200).end();
+                }
+            });
+        }
+    });
+});
+
+/* update vote */
+app.put("/news/:id/vote", function(req, res) {
+    var news = req.body;
+    db.collection(NEWS_COLLECTION).findOne({
+        _id: new ObjectID(req.params.id)
+    }, function(err, doc) {
+        if (err) {
+            handleError(res, err.message, "Failed to get news");
+        } else {
+            doc.vote = news.vote;
+            console.log(doc)
+            db.collection(NEWS_COLLECTION).updateOne({
+                _id: new ObjectID(req.params.id)
+            }, doc, function(err, doc) {
+                if (err) {
+                    handleError(res, err.message, "Failed to update news");
+                } else {
+                    res.status(200).end();
+                }
+            });
+        }
+    });
+});
+
 /* add news */
 app.post("/news", function(req, res) {
     console.log("add news");
@@ -125,38 +175,6 @@ app.delete("/news/:id", function(req, res) {
             handleError(res, err.message, "Failed to delete news");
         } else {
             res.status(204).end();
-        }
-    });
-});
-
-
-/********** COMMENT **********/
-/********** COMMENT **********/
-/********** COMMENT **********/
-/********** COMMENT **********/
-
-/* get all comments by news id*/
-app.get("/comments/:id", function(req, res) {
-    db.collection(COMMENTS_COLLECTION).find({ news_id: req.params.id }).toArray(function(err, docs) {
-        if (err) {
-            handleError(res, err.message, "Failed to get comments.");
-        } else {
-            res.status(200).json(docs);
-        }
-    });
-});
-
-/* add comments */
-app.post("/comments", function(req, res) {
-    console.log("add comments");
-    var comments = req.body;
-    comments.createDate = new Date();
-
-    db.collection(COMMENTS_COLLECTION).insertOne(comments, function(err, doc) {
-        if (err) {
-            handleError(res, err.message, "Failed to create new comment.");
-        } else {
-            res.status(201).json(doc.ops[0]);
         }
     });
 });
